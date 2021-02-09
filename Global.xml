@@ -1,0 +1,554 @@
+<Defaults>
+    <!-- scoreboard -->
+    <Panel class="sb-header-entry" padding="3 3 3 3"/>
+    <Text class="sb-header-entry" fontStyle="Bold" resizeTextForBestFit="true"/>
+    <Panel class="sb-header-entry" color="#FFFFFF" outline="#000000" outlineSize="2 0"/>
+
+    <Text class="sb-round-entry" fontSize="22" fontStyle="Bold" color="#000000" alignment="MiddleRight" offsetXY="-7 0"/>
+    <Panel class="sb-round-entry" color="#B7B7BF"/>
+
+    <Text class="sb-score-entry" fontSize="26" fontStyle="Bold"/>
+    <Panel class="sb-score-entry" color="#FFFFFF" outline="#000000" outlineSize="2 1" minWidth="60"/>
+
+    <Text class="sb-trick-entry" fontSize="26" fontStyle="Bold"/>
+    <Panel class="sb-trick-entry" color="#FFFFFF" outline="#000000" minWidth="40"/>
+
+    <Cell class="sb-entry" dontUseTableCellBackground="true"/>
+    <Cell class="sb-empty" dontUseTableCellBackground="true"/>
+
+    <Panel class="scoreboard" outline="#000000" outlineSize="2 2"/>
+
+    <!-- admin panel -->
+    <Panel class="admin-panel" flexibleHeight="0" outline="#000000" outlineSize="1 1"/>
+
+    <VerticalLayout class="setting-group" childForceExpandHeight="false" />
+    <ToggleGroup class="setting-group"/>
+    <HorizontalLayout class="setting" preferredHeight="50" minHeight="50" height="50" flexibleHeight="0" tooltipPosition="Below" tooltipOffset="10" outline="#000000" outlineSize="1 1" color="#FFFFFF" tooltipBackgroundColor="#000000" shadow="rgba(0,0,0,0.1)" shadowDistance="-8 -8"/>
+    <Panel class="setting-header" color="#B7B7BF"/>
+    <Text class="setting-header" resizeTextForBestFit="true" fontStyle="Bold"/>
+    <Text class="setting-name" fontSize="24"/>
+</Defaults>
+
+<!-- the admin panel -->
+<VerticalLayout id="admin-panel" class="admin-panel" visibility="Admin" color="#FFFFFF" rectAlignment="MiddleRight" active="false" width="600" height="900" outline="#000000" outlineSize="2 2">
+    <Panel class="admin-panel" preferredHeight="80" color="#B7B7BF" shadow="rgba(0,0,0,0.1)" shadowDistance="0 -6">
+        <Text resizeTextForBestFit="true" fontStyle="Bold">{en}Preferences{de}Einstellungen</Text>
+    </Panel>
+
+    <Panel class="admin-panel" preferredHeight="820" padding="30 30 50 50">
+        <VerticalLayout childAlignment="UpperCenter" childForceExpandHeight="false" spacing="40">
+            <VerticalLayout class="setting-group">
+                <HorizontalLayout class="setting">
+                    <Panel class="setting-header">
+                        <Text class="setting-header">{en}General{de}Allgemein{fr}En général</Text>
+                    </Panel>
+                </HorizontalLayout>
+                <HorizontalLayout class="setting">
+                    <Panel class="setting-name"><Text class="setting-name">{en}Mod language{de}Mod Sprache{fr}La langue du jeu</Text></Panel>
+                    <Panel class="setting-input">
+                        <Dropdown class="setting-input" onValueChanged="onSelectLanguage">
+                            <Option class="setting-input">English</Option>
+                            <Option class="setting-input">German</Option>
+                            <Option class="setting-input">French</Option>
+                        </Dropdown>
+                    </Panel>
+                </HorizontalLayout>
+            </VerticalLayout>
+
+            <ToggleGroup class="setting-group">
+                <VerticalLayout class="setting-group">
+                    <HorizontalLayout class="setting">
+                        <Panel class="setting-header">
+                            <Text class="setting-header">{en}Game variants{de}Spielvarianten{fr}Versions</Text>
+                        </Panel>
+                    </HorizontalLayout>
+                    <HorizontalLayout class="setting" tooltip="The basic game without any variant" >
+                        <Panel class="setting-name"><Text class="setting-name">{en}Classic (None){de}Standard (Keine){fr}Standard</Text></Panel>
+                        <Panel class="setting-input"><Toggle id="setting-variant-none" class="setting-input" onClick="onSetGameVariant(None)"></Toggle></Panel>
+                    </HorizontalLayout>
+                    <HorizontalLayout class="setting" tooltip="In each round the last player that has to make the bid must place his bet such that the total number of bets made is not equal to the number of tricks available in that round. For example: If it is round 7 and the previous three players made the bets 1, 3 and 2 (1+3+2 = 6) then the last player is not allowed to bit 1 trick (round 7 and 6+1 = 7)." >
+                        <Panel class="setting-name"><Text class="setting-name">{en}Plus/minus one{de}Plus/minus Eins{fr}Notequal</Text></Panel>
+                        <Panel class="setting-input"><Toggle id="setting-variant-plus-minus-one" class="setting-input" onClick="onSetGameVariant(PlusMinusOne)"></Toggle></Panel>
+                    </HorizontalLayout>
+                    <HorizontalLayout class="setting" tooltip="Every player places his bet hidden. By that nobody is affected by the bids of the others but only by his own cards" >
+                        <Panel class="setting-name"><Text class="setting-name">{en}Hidden bid{de}Versteckter Tipp{fr}Pli cachée</Text></Panel>
+                        <Panel class="setting-input"><Toggle id="setting-variant-hidden-bid" class="setting-input" onClick="onSetGameVariant(HiddenBid)"></Toggle></Panel>
+                    </HorizontalLayout>
+                </VerticalLayout>
+            </ToggleGroup>
+        </VerticalLayout>
+    </Panel>
+</VerticalLayout>
+
+<!-- the scoreboard -->
+<Panel id="scoreboard" class="scoreboard" color="#FFFFFF" rectAlignment="MiddleRight" active="false" width="640" height="900">
+    <TableLayout id="sb-table" columnWidths="40 100 100 100 100 100 100" rowBackgroundColor="#19191A" cellBackgroundColor="#FFFFFF">
+
+        <!-- header row with the player names -->
+        <Row id="sb-table-header">
+            <Cell dontUseTableCellBackground="true" cellBackgroundColor="#19191A"></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p1-name" class="sb-header-entry"/></Panel></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p2-name" class="sb-header-entry"/></Panel></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p3-name" class="sb-header-entry"/></Panel></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p4-name" class="sb-header-entry"/></Panel></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p5-name" class="sb-header-entry"/></Panel></Cell>
+            <Cell><Panel class="sb-header-entry" ><Text id="sb-table-p6-name" class="sb-header-entry"/></Panel></Cell>
+        </Row>
+
+        <!-- the round rows with the tricks and scores -->
+        <Row id="sb-table-r1" class="sb-row" outline="#000000" outlineSize="0 2">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >1</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r1" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r1" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r2" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >2</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r2" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r2" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r3" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >3</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r3" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r3" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r4" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >4</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r4" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r4" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r5" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >5</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r5" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r5" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r6" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >6</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r6" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r6" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r7" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >7</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r7" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r7" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r8" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >8</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r8" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r8" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r9" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >9</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r9" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r9" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r10" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >10</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p6-r10" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p6-r10" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r11" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >11</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r11" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r11" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r11" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r11" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r11" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r11" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r11" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r11" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r11" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r11" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r12" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >12</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r12" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r12" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r12" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r12" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r12" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r12" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r12" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r12" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p5-r12" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p5-r12" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r13" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >13</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r13" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r13" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r13" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r13" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r13" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r13" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r13" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r13" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r14" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >14</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r14" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r14" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r14" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r14" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r14" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r14" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r14" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r14" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r15" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >15</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r15" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r15" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r15" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r15" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r15" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r15" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p4-r15" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p4-r15" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r16" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >16</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r16" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r16" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r16" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r16" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r16" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r16" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r17" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >17</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r17" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r17" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r17" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r17" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r17" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r17" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r18" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >18</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r18" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r18" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r18" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r18" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r18" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r18" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r19" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >19</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r19" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r19" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r19" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r19" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r19" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r19" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+        <Row id="sb-table-r20" class="sb-row">
+            <Cell class="sb-round-entry"><Panel class="sb-round-entry" ><Text class="sb-round-entry" >20</Text></Panel></Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p1-r20" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p1-r20" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p2-r20" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p2-r20" class="sb-trick-entry"/></Panel>
+            </Cell>
+            <Cell class="sb-entry">
+                <Panel class="sb-score-entry"><Text id="sb-table-score-p3-r20" class="sb-score-entry"/></Panel>
+                <Panel class="sb-trick-entry"><Text id="sb-table-trick-p3-r20" class="sb-trick-entry"/></Panel>
+            </Cell>
+        </Row>
+    </TableLayout>
+</Panel>
+
+<!-- the button that opens the admin panel -->
+<Button id="admin-panel-button" visibility="Admin" onClick="onAdminPanelToggle" outline="#000000" resizeTextForBestFit="true" width="200" height="55" rectAlignment="LowerRight" offsetXY="-300 10" tooltipPosition="Above" >{de}Einstellungen{en}Settings</Button>
+
+<!-- the button that opens the scoreboard -->
+<Button id="scoreboard-button" onClick="onScoreboardToggle" outline="#000000" resizeTextForBestFit="true" width="200" height="55" rectAlignment="LowerRight" offsetXY="-85 10" tooltipPosition="Above" >Scoreboard</Button>
