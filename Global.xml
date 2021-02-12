@@ -19,7 +19,7 @@
     <Panel class="scoreboard" outline="#000000" outlineSize="2 2"/>
 
     <!-- admin panel -->
-    <Panel class="admin-panel" flexibleHeight="0" outline="#000000" outlineSize="1 1"/>
+    <Panel class="admin-panel" preferredHeight="820" flexibleHeight="0" outline="#000000" outlineSize="1 1" padding="30 30 50 50"/>
 
     <VerticalLayout class="setting-group" childForceExpandHeight="false" />
     <ToggleGroup class="setting-group"/>
@@ -27,7 +27,55 @@
     <Panel class="setting-header" color="#B7B7BF"/>
     <Text class="setting-header" resizeTextForBestFit="true" fontStyle="Bold"/>
     <Text class="setting-name" fontSize="24"/>
+
+    <!-- trick selection -->
+    <VerticalLayout class="trick-selection" width="600" height="300" spacing="20"/>
+    <Panel class="trick-selection" color="#FFFFFF" minHeight="40" outline="#000000"/>
+    <TableLayout class="trick-selection" cellSpacing="20" flexibleHeight="100"/>
+    <Text class="trick-selection" resizeTextMaxSize="28" resizeTextForBestFit="true" fontStyle="Bold"/>
+    <Cell class="trick-selection" dontUseTableCellBackground="true"/>
+    <Button class="trick-selection" fontSize="30" fontStyle="Bold"/>
 </Defaults>
+
+
+
+
+<!-- the buttons to select the amount of tricks -->
+<VerticalLayout class="trick-selection" id="trick-selection" visibility="" active="false">
+    <Panel class="trick-selection"><Text class="trick-selection">{en}Select your amount of tricks{de}Wähle deine Anzahl an Stichen{fr}Annonce les plis</Text></Panel>
+    <TableLayout class="trick-selection">
+        <Row class="trick-selection">
+        	<Cell class="trick-selection"><Button id="trick-selection-button0" class="trick-selection" onClick="onBetTrick(0)">0</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button1" class="trick-selection" onClick="onBetTrick(1)">1</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button2" class="trick-selection" onClick="onBetTrick(2)">2</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button3" class="trick-selection" onClick="onBetTrick(3)">3</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button4" class="trick-selection" onClick="onBetTrick(4)">4</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button5" class="trick-selection" onClick="onBetTrick(5)">5</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button6" class="trick-selection" onClick="onBetTrick(6)">6</Button></Cell>
+        </Row>
+        <Row class="trick-selection">
+        	<Cell class="trick-selection"><Button id="trick-selection-button7" class="trick-selection" onClick="onBetTrick(7)">7</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button8" class="trick-selection" onClick="onBetTrick(8)">8</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button9" class="trick-selection" onClick="onBetTrick(9)">9</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button10" class="trick-selection" onClick="onBetTrick(10)">10</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button11" class="trick-selection" onClick="onBetTrick(11)">11</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button12" class="trick-selection" onClick="onBetTrick(12)">12</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button13" class="trick-selection" onClick="onBetTrick(13)">13</Button></Cell>
+        </Row>
+        <Row class="trick-selection">
+        	<Cell class="trick-selection"><Button id="trick-selection-button14" class="trick-selection" onClick="onBetTrick(14)">14</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button15" class="trick-selection" onClick="onBetTrick(15)">15</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button16" class="trick-selection" onClick="onBetTrick(16)">16</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button17" class="trick-selection" onClick="onBetTrick(17)">17</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button18" class="trick-selection" onClick="onBetTrick(18)">18</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button19" class="trick-selection" onClick="onBetTrick(19)">19</Button></Cell>
+        	<Cell class="trick-selection"><Button id="trick-selection-button20" class="trick-selection" onClick="onBetTrick(20)">20</Button></Cell>
+        </Row>
+    </TableLayout>
+</VerticalLayout>
+
+
+
 
 <!-- the admin panel -->
 <VerticalLayout id="admin-panel" class="admin-panel" visibility="Admin" color="#FFFFFF" rectAlignment="MiddleRight" active="false" width="600" height="900" outline="#000000" outlineSize="2 2">
@@ -35,7 +83,7 @@
         <Text resizeTextForBestFit="true" fontStyle="Bold">{en}Preferences{de}Einstellungen</Text>
     </Panel>
 
-    <Panel class="admin-panel" preferredHeight="820" padding="30 30 50 50">
+    <Panel class="admin-panel">
         <VerticalLayout childAlignment="UpperCenter" childForceExpandHeight="false" spacing="40">
             <VerticalLayout class="setting-group">
                 <HorizontalLayout class="setting">
@@ -79,6 +127,9 @@
         </VerticalLayout>
     </Panel>
 </VerticalLayout>
+
+
+
 
 <!-- the scoreboard -->
 <Panel id="scoreboard" class="scoreboard" color="#FFFFFF" rectAlignment="MiddleRight" active="false" width="640" height="900">

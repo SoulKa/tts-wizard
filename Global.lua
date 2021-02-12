@@ -1,12 +1,13 @@
 -- GLOBAL VARIABLES --
 GameVariants = { "None", "PlusMinusOne", "HiddenBid" }
-CardProperties = {}
+CardProperties = {} -- contains the values and colors of the cards (mapped to their guid)
 Deck = {}
 CardColors = {"green", "red", "blue", "yellow"}
+IS_DEBUG = false
 
 -- the current state of the game
 GameState = {
-    Players = {},      -- { string player }
+    Players = {},               -- { string player }
     Round = 0,
     PlayedCards = {},           -- { { string player, string color, int value, string guid } }
     HandCards = {},             -- { string player = { string guid } }
@@ -259,7 +260,7 @@ function onSelectTrumpColor(pressedByColor, trumpColor)
     for i=#buttons,1,-1 do dealerTable.removeButton(buttons[i].index) end
 
     -- spawn the buttons to bet on the tricks
-    spawnBetTrickButtons()
+    initiallySpawnBetTrickButtons()
 end
 
 function onObjectEnterScriptingZone(zone, enter_object)
@@ -399,7 +400,7 @@ function onDealPressed(_, player, wasRightClick)
     Rules.removeButton(0)
 
     -- spawn the buttons to make a bet on the tricks if the trump is not a wizard
-    if (deal()) then spawnBetTrickButtons() end
+    if (deal()) then initiallySpawnBetTrickButtons() end
 end
 
 -- ends a running trick
@@ -589,55 +590,66 @@ function resetBetCount()
     GameState.BetSum = 0
 end
 
--- spawns 21 buttons with which the player can bet the amount of tricks he'll gets
-function spawnBetTrickButtons()
-    local player = GameState.Players[GameState.CurrentPlayer]
-    local tab = PlayerObjects[player].Table
-
-    local tableSize = { x=30, y=0, z=15 }
-    local tableWidth = tableSize.x - 18
-    local tableHeight = tableSize.z + 3
-    local leftTop = { x=-tableWidth/2-2.4, y=0.6, z=-tableHeight/2+3 }
-    local buttonWidth = tableWidth / 5
-    local buttonHeight = tableHeight / 4
-
-    local i = 0
-    for z=0, 2, 1 do
-        for x=0, 6, 1 do
-            if (i > GameState.Round) then break end
-            if ((GameState.Settings.Variant ~= "PlusMinusOne" or not (GameState.BetCount == #GameState.Players-1 and GameState.BetSum+i == GameState.Round))) then
-                tab.createButton({
-                    click_function = "bet_"..tostring(i),
-                    label          = tostring(i),
-                    position       = { leftTop.x + x*buttonWidth + buttonWidth/2, leftTop.y, leftTop.z + z*buttonHeight + buttonHeight/2 },
-                    width          = buttonWidth * 400,
-                    height         = buttonHeight * 400,
-                    font_size      = 600,
-                    tooltip        = Locale[Locale.CurrentLocale].betOnXTricks(i)
-                })
-            end
-            i=i+1
-        end
+-- shows the bet trick buttons depending on the gamemode
+function initiallySpawnBetTrickButtons()
+    if (GameState.Settings.Variant == "HiddenBid") then
+        showBetTrickButtons( GameState.Players )
+    else
+        showBetTrickButtons( { getCurrentPlayerColor() } )
     end
 end
 
+-- shows the bet trick buttons for the given (string) players
+function showBetTrickButtons( players, hideNumber )
+    if (#players > 0 and IS_DEBUG) then table.insert(players, "Host") end
+    local visibility = ""
+    for i=0, 20, 1 do
+        UI.setAttribute("trick-selection-button"..i, "active", (i > GameState.Round or (type(hideNumber) == "number" and i == hideNumber)) and "false" or "true")
+    end
+    for i, player in ipairs(players) do
+        if (i > 1) then visibility = visibility .. "|" end
+        visibility = visibility .. player
+    end
+    --print("Showing the bet buttons to " .. visibility)
+    UI.setAttributes("trick-selection", { visibility=visibility, active=((#players == 0) and "false" or "true") })
+end
+
 -- bets the given amount of tricks for the current player
-function betTrick(pressedByPlayer, amount)
-    local player = GameState.Players[GameState.CurrentPlayer]
-    if (pressedByPlayer ~= player) then return end
-    local playerName = Player[player].steam_name
+function betTrick(player, amount)
+    local playerName = player.steam_name
+    player = player.color
+    local playerIndex = getIndexOfPlayer(player)
+    if (GameState.Bets[player] ~= nil or playerIndex < 1) then
+        print("Player \"" .. player .."\" already bet!")
+        return
+    end
 
-    local currentTable = PlayerObjects[player].Table
-    local buttons = currentTable.getButtons()
-    for i=#buttons,1,-1 do currentTable.removeButton(buttons[i].index) end
-
-    writeInCell(GameState.Round, GameState.CurrentPlayer, tostring(amount), true)
-    printToAll(Locale[Locale.CurrentLocale].playerBetsAmount(Player[player].steam_name, amount))
+    -- modify game state
     GameState.BetSum = GameState.BetSum+amount
     GameState.BetCount = GameState.BetCount+1
     GameState.Bets[player] = amount
-    nextTurn()
-    if (not allBetsDone()) then spawnBetTrickButtons() end
+
+    -- check the game mode/variant
+    local playersToShowBetTricksButtons = {}
+    if (GameState.Settings.Variant == "HiddenBid") then
+        if (GameState.BetCount == #GameState.Players) then
+            for player, amount in pairs(GameState.Bets) do
+                playerIndex = getIndexOfPlayer(player)
+                if (playerIndex > 0) then writeInCell(GameState.Round, playerIndex, tostring(amount), true) end
+                printToAll(Locale[Locale.CurrentLocale].playerBetsAmount(player, amount))
+            end
+        else
+            playersToShowBetTricksButtons = filter(GameState.Players, | p | GameState.Bets[p] == nil )
+        end
+    else
+        writeInCell(GameState.Round, playerIndex, tostring(amount), true)
+        printToAll(Locale[Locale.CurrentLocale].playerBetsAmount(playerName, amount))
+        nextTurn()
+        if (not allBetsDone()) then table.insert(playersToShowBetTricksButtons, getCurrentPlayerColor()) end
+    end
+
+    -- show the buttons to the correct player(s) and maybe hide one button to prevent equal bids
+    showBetTrickButtons( playersToShowBetTricksButtons, (GameState.Settings.Variant == "PlusMinusOne" and GameState.BetCount == (#GameState.Players-1)) and (GameState.Round - GameState.BetSum) or nil )
 end
 
 -- returns true if all bets are done
@@ -716,13 +728,13 @@ function createPairs( tbl )
 end
 
 function reverse( t )
-  local n = #t
-  local i = 1
-  while i < n do
-    t[i],t[n] = t[n],t[i]
-    i = i + 1
-    n = n - 1
-  end
+    local n = #t
+    local i = 1
+    while i < n do
+        t[i],t[n] = t[n],t[i]
+        i = i + 1
+        n = n - 1
+    end
 end
 
 function stringSplit( str, sep )
@@ -787,25 +799,11 @@ function onSelectLanguage( player, language )
     broadcastToAll(Locale[Locale.CurrentLocale].languageIsNow())
 end
 
--- functions to pass button parameters ; PLEASE TTS IMPLEMENT FUNCTION PARAMETERS FFS!!!
-_G.bet_0 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 0) end
-_G.bet_1 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 1) end
-_G.bet_2 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 2) end
-_G.bet_3 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 3) end
-_G.bet_4 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 4) end
-_G.bet_5 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 5) end
-_G.bet_6 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 6) end
-_G.bet_7 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 7) end
-_G.bet_8 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 8) end
-_G.bet_9 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 9) end
-_G.bet_10 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 10) end
-_G.bet_11 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 11) end
-_G.bet_12 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 12) end
-_G.bet_13 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 13) end
-_G.bet_14 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 14) end
-_G.bet_15 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 15) end
-_G.bet_16 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 16) end
-_G.bet_17 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 17) end
-_G.bet_18 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 18) end
-_G.bet_19 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 19) end
-_G.bet_20 = function(_, pressedByPlayer) betTrick(pressedByPlayer, 20) end
+function onBetTrick( player, amount )
+    amount = tonumber(amount)
+    if (amount == nil or amount < 0 or amount > 20) then
+        printToColor("Invalid trick amount: " .. amount, player)
+        return
+    end
+    betTrick(player, amount)
+end
